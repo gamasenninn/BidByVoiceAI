@@ -40,6 +40,7 @@ MESSAGE_TEMPLATE = """
         'battery_size':(バッテリーサイズ),
         'primary_transmission': (主変速。制約2),
         'secondary_transmission':(副変速),
+        'memo':(備考),
         'listing_details':[(出品詳細)] 
     }}]
 }}

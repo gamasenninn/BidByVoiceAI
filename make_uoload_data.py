@@ -100,9 +100,13 @@ def convert_data(src_data):
         '梱包サイズ横': src_data.get('size_width',""),
         '梱包サイズ高': src_data.get('size_height',""),
         '出品詳細': detail,
-        '商品ランク': "-",
+        '商品ランク': '-',
+        '出品担当': "小野",
+        '発送': "直接",
         '商品状態': "istatus_used20",
         '出品日数': "2",
+        'PDNSメーカー': src_data.get('maker',""),
+        '備考': src_data.get('memo',""),
         '他出品': "P"      
     }
 
@@ -133,3 +137,16 @@ if __name__ == "__main__":
     df = make_upload_data(json_data)
     print(df)
     df.to_csv('output.csv', index=False)
+
+
+
+    # データフレームを JSON 形式の辞書に変換
+    data_dict = df.to_dict(orient='records')
+
+    # ファイルに出力
+    output_file = 'output.json'  # 出力するファイル名
+
+    with open(output_file, 'w', encoding='utf-8') as file:
+        json.dump(data_dict, file, ensure_ascii=False, indent=4)
+
+    print(f"データが {output_file} に保存されました。")
