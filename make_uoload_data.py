@@ -56,6 +56,10 @@ def convert_data(src_data):
             entry_date = formatted_date
 
     detail = ""
+    # アワー
+    if src_data.get('primary_transmission',""): 
+        detail += 'アワーメーター: '+ src_data.get('hour') + "//（展示移動によるメーター加算はご了承ください）//"  
+
     # 主変速
     if src_data.get('primary_transmission',""): 
         detail += '主変速: '+ src_data.get('primary_transmission') + "//"  
