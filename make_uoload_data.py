@@ -6,41 +6,30 @@ from datetime import datetime
 import re
 import csv
 import pandas as pd
+from dotenv import load_dotenv
 
-def make_csv(src_data):
+load_dotenv()
 
-    # CSVファイルへの書き出し
-    with open('output.csv', 'a', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        # ヘッダーの書き込み
-        writer.writerow(src_data.keys())
-        # データ行の書き込み
-        writer.writerow(src_data.values())
+UPLOAD_FILE_NAME = os.environ["UPLOAD_FILE_NAME"]
 
-    print("CSVファイルにデータが書き出されました。")
+detail_replacements = {
+        "堀取機": "手回しによる回転確認済です。",
+        "ハロー": "手回しによる回転確認済です。",
+        "トラクター": "エンジン始動し、走行、ロータリーの回転などの動作確認済です",
+        "管理機": "エンジン始動し、走行、ロータリーの回転などの動作確認済です",
+        "コンバイン": "エンジン始動し、走行、刈取などの動作確認済です。\\実際の稲を使っての実戦テストは環境上行っておりません。",
+        "田植機": "エンジン始動し、走行、植付などの動作確認済です"
+    }
 
+def make_top_sentence(text):
+    for key, value in detail_replacements.items():
+        # キーがtextに含まれていたらvalueを返す
+        if key in text:
+            return value
+    return None
 
-def make_sql(src_data):
-
-    # テーブル名
-    table_name = "出品管理票"
-
-    # SQL文の基本形を作成
-    columns = ", ".join(src_data.keys())
-    placeholders = ", ".join(["%s"] * len(src_data))
-    insert_query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-
-    # 値をタプルとして抽出
-    values = tuple(src_data.values())
-
-    # SQL文を生成
-    sql = insert_query % values
-
-    print(sql)
 
 def convert_data(src_data):
-    print(json.dumps(src_data, ensure_ascii=False, indent=4))
-    print("-----------------------")
 
     #記入日変換
     entry_date = src_data.get('entry_date',"")
@@ -55,7 +44,15 @@ def convert_data(src_data):
             formatted_date = datetime.strptime(f'2024-{month}-{day}', '%Y-%m-%d').strftime('%Y/%m/%d')
             entry_date = formatted_date
 
+    # 現在の日付を取得し、YYYY/MM/DD形式に変換
+    current_date = datetime.now().strftime("%Y/%m/%d")
+
+
     detail = ""
+    # 冒頭文を作成
+    if src_data.get('product_name',""):
+        detail += make_top_sentence(src_data.get('product_name',""))+"\\"
+
     # アワー
     if src_data.get('primary_transmission',""): 
         detail += 'アワーメーター: '+ src_data.get('hour') + "\\（展示移動によるメーター加算はご了承ください）\\"  
@@ -90,7 +87,7 @@ def convert_data(src_data):
         detail += '燃料種別: '+ src_data.get('fuel_type')+ "\\"
 
     #定型文
-    detail+= "経年と使用によるサビ、傷、汚れがあります。\\画像のもので全てです。"       
+    detail+= "\\経年と使用によるサビ、傷、汚れがあります。\\画像のもので全てです。"       
 
     converted = {
         '相対番号': src_data.get('listing_number',""),
@@ -111,6 +108,7 @@ def convert_data(src_data):
         '出品日数': "2",
         'PDNSメーカー': src_data.get('maker',""),
         '備考': src_data.get('memo',""),
+        '出品日': current_date,
         '他出品': "P"      
     }
 
@@ -121,11 +119,8 @@ def make_upload_data(src_json_data):
     converted_list = []
     for j in src_json_data.get('listing'):
         converted = convert_data(j)
-        print(converted)
         converted_list.append(converted)
 
-        #make_sql(converted)
-        #make_csv(converted)
     df = pd.DataFrame(converted_list)
     return df
 
@@ -139,17 +134,14 @@ if __name__ == "__main__":
         json_data = json.load(f)
  
     df = make_upload_data(json_data)
-    print(df)
-    df.to_csv('output.csv', index=False)
-
-
-
     # データフレームを JSON 形式の辞書に変換
     data_dict = df.to_dict(orient='records')
 
-    # ファイルに出力
-    output_file = 'output.json'  # 出力するファイル名
+    # CSVファイルに出力
+    df.to_csv(f'{UPLOAD_FILE_NAME}.csv', index=False)
 
+    # ファイルに出力
+    output_file = f'{UPLOAD_FILE_NAME}.json'  # 出力するファイル名
     with open(output_file, 'w', encoding='utf-8') as file:
         json.dump(data_dict, file, ensure_ascii=False, indent=4)
 
