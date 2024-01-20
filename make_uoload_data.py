@@ -58,39 +58,39 @@ def convert_data(src_data):
     detail = ""
     # アワー
     if src_data.get('primary_transmission',""): 
-        detail += 'アワーメーター: '+ src_data.get('hour') + "//（展示移動によるメーター加算はご了承ください）//"  
+        detail += 'アワーメーター: '+ src_data.get('hour') + "\\（展示移動によるメーター加算はご了承ください）\\"  
 
     # 主変速
     if src_data.get('primary_transmission',""): 
-        detail += '主変速: '+ src_data.get('primary_transmission') + "//"  
+        detail += '主変速: '+ src_data.get('primary_transmission') + "\\"  
 
     #副変速
     if src_data.get('secondary_transmission',""): 
-        detail += '副変速: '+ src_data.get('secondary_transmission')+ "//"
+        detail += '副変速: '+ src_data.get('secondary_transmission')+ "\\"
 
     #耕耘幅
     if src_data.get('plowing_width',""): 
-        detail += '//耕耘幅: '+ src_data.get('plowing_width')+ "//"
+        detail += '\\耕耘幅: '+ src_data.get('plowing_width')+ "\\"
 
     #刈幅
     if src_data.get('mowing_width',""): 
-        detail += '//刈幅: '+ src_data.get('mowing_width')+ "//"
+        detail += '\\刈幅: '+ src_data.get('mowing_width')+ "\\"
 
     #エンジン型式
-    detail += "//"
+    detail += "\\"
     if src_data.get('engine_model',""): 
-        detail += 'エンジン型式: '+ src_data.get('engine_model')+ "//"
+        detail += 'エンジン型式: '+ src_data.get('engine_model')+ "\\"
 
     #最大出力
     if src_data.get('max_ps',""): 
-        detail += '最大出力: '+ src_data.get('max_ps')+ "PS//"
+        detail += '最大出力: '+ src_data.get('max_ps')+ "PS\\"
 
     #燃料種別
     if src_data.get('fuel_type',""): 
-        detail += '燃料種別: '+ src_data.get('fuel_type')+ "//"
+        detail += '燃料種別: '+ src_data.get('fuel_type')+ "\\"
 
     #定型文
-    detail+= "経年と使用によるサビ、傷、汚れがあります。//画像のもので全てです。"       
+    detail+= "経年と使用によるサビ、傷、汚れがあります。\\画像のもので全てです。"       
 
     converted = {
         '相対番号': src_data.get('listing_number',""),
