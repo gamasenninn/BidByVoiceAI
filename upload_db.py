@@ -14,18 +14,21 @@ def upload_to_db(file_path):
     conn_str = os.environ["CONN_STR"]
     conn = sql_connect(conn_str)
 
+    error_count = 0
     for data in  data_dict:
         #print(data)
         ret = dict_insert(conn,table_name,data)
         print(ret)
+        if not "OK" in ret:
+            print("なんらかのエラー!!")
+            error_count += 1
 
-    conn.commit()
+    if error_count:
+        print("なんらかのエラーが発生したため、コミットはされませんでした。")
+    else:
+        conn.commit()
+    
     conn.close()
-
-
-
-
-
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
