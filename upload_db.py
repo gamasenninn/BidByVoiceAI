@@ -18,9 +18,10 @@ def upload_to_db(file_path):
     for data in  data_dict:
         #print(data)
         ret = dict_insert(conn,table_name,data)
-        print(ret)
-        if not "OK" in ret:
-            print("なんらかのエラー!!")
+        if "OK" in ret:
+            print("insert...OK")
+        else:
+            print(ret)
             error_count += 1
 
     if error_count:
