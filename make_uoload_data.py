@@ -18,7 +18,8 @@ detail_replacements = {
         "トラクター": "エンジン始動し、走行、ロータリーの回転などの動作確認済です",
         "管理機": "エンジン始動し、走行、ロータリーの回転などの動作確認済です",
         "コンバイン": "エンジン始動し、走行、刈取などの動作確認済です。\\実際の稲を使っての実戦テストは環境上行っておりません。",
-        "田植機": "エンジン始動し、走行、植付などの動作確認済です"
+        "田植機": "エンジン始動し、走行、植付などの動作確認済です",
+        "草刈機": "エンジン始動し、走行、刈刃の回転などの動作確認済です"
     }
 
 def make_top_sentence(text):
@@ -26,7 +27,7 @@ def make_top_sentence(text):
         # キーがtextに含まれていたらvalueを返す
         if key in text:
             return value
-    return None
+    return ""
 
 
 def convert_data(src_data):
@@ -54,7 +55,7 @@ def convert_data(src_data):
         detail += make_top_sentence(src_data.get('product_name',""))+"\\"
 
     # アワー
-    if src_data.get('primary_transmission',""): 
+    if src_data.get('hour',""): 
         detail += 'アワーメーター: '+ src_data.get('hour') + "\\（展示移動によるメーター加算はご了承ください）\\"  
 
     # 主変速
@@ -97,9 +98,9 @@ def convert_data(src_data):
         '商品名':   src_data.get('product_name',""),
         'メーカー': src_data.get('maker',""),
         '型式': src_data.get('model',""),
-        '梱包サイズ縦': src_data.get('size_depth',""),
-        '梱包サイズ横': src_data.get('size_width',""),
-        '梱包サイズ高': src_data.get('size_height',""),
+        '梱包サイズ縦': src_data.get('size_depth') if 'size_depth' in src_data else "0",
+        '梱包サイズ横': src_data.get('size_width') if 'size_width' in src_data else "0",
+        '梱包サイズ高': src_data.get('size_height') if 'size_height' in src_data else "0",
         '出品詳細': detail,
         '商品ランク': '-',
         '出品担当': "小野",
