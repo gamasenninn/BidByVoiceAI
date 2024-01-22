@@ -31,9 +31,9 @@ def load_template():
         raise Exception("TemplateFileNotfound")
 
 def to_json(json_data,file_path):
-            # ファイル名の拡張子を.jsonに変更
-        json_file_path = file_path.split('.')[0] + '.json'
-
+        # ファイル名の拡張子を.jsonに変更
+        file_name, file_extension = os.path.splitext(file_path)
+        json_file_path = file_name + '.json'        
         # JSONデータをファイルに保存
         with open(json_file_path, "w", encoding='utf-8') as json_file:
             # エスケープ文字を改行に変換して表示
