@@ -89,7 +89,11 @@ def convert_data(src_data):
         detail += '燃料種別: '+ src_data.get('fuel_type')+ "\\"
 
     #定型文
-    detail+= "\\経年と使用によるサビ、傷、汚れがあります。\\画像のもので全てです。"       
+    detail+= "\\経年と使用によるサビ、傷、汚れがあります。\\画像のもので全てです。"
+
+    #備考
+    memo = src_data.get('memo',"")
+    memo +=  '\\バッテリーサイズ: ' + src_data.get('battery_size',"")+ "\\"      
 
     converted = {
         '相対番号': src_data.get('listing_number',""),
@@ -109,7 +113,7 @@ def convert_data(src_data):
         '商品状態': "istatus_used20",
         '出品日数': "2",
         'PDNSメーカー': src_data.get('maker',""),
-        '備考': src_data.get('memo',""),
+        '備考': memo,
         '出品日': current_date,
         '他出品': "P"      
     }
