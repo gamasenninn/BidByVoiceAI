@@ -8,6 +8,7 @@ import csv
 import pandas as pd
 from dotenv import load_dotenv
 import time
+import pprint
 
 load_dotenv()
 
@@ -16,10 +17,12 @@ UPLOAD_FILE_NAME = os.environ["UPLOAD_FILE_NAME"]
 detail_replacements = {
         "堀取機": "手回しによる回転確認済です。",
         "ハロー": "手回しによる回転確認済です。",
+        "トラクター用": "手回しによる回転確認済です",
         "トラクター": "エンジン始動し、走行、ロータリーの回転などの動作確認済です",
         "管理機": "エンジン始動し、走行、ロータリーの回転などの動作確認済です",
         "コンバイン": "エンジン始動し、走行、刈取などの動作確認済です。\\実際の稲を使っての実戦テストは環境上行っておりません。",
         "田植機": "エンジン始動し、走行、植付などの動作確認済です",
+        "運搬車": "エンジン始動し、走行、◯◯ダンプ動作などの動作確認済です",
         "草刈機": "エンジン始動し、走行、刈刃の回転などの動作確認済です"
     }
 
@@ -61,7 +64,7 @@ def convert_data(src_data):
 
     # 主変速
     if src_data.get('primary_transmission',""): 
-        detail += '主変速: '+ src_data.get('primary_transmission') + "\\"  
+        detail += '主変速: '+ src_data.get('primary_transmission').upper() + "\\"  
 
     #副変速
     if src_data.get('secondary_transmission',""): 
@@ -75,10 +78,23 @@ def convert_data(src_data):
     if src_data.get('mowing_width',""): 
         detail += '\\刈幅: '+ src_data.get('mowing_width')+ "\\"
 
+    #荷台寸法
+    if src_data.get('cargo_size',""): 
+        detail += '\\荷台寸法: '+ src_data.get('cargo_size')+ "\\"
+        
+    #最大積載量
+    if src_data.get('max_load',""): 
+        detail += '\\最大積載量: '+ src_data.get('max_load')+ "\\"
+
+    #作業機情報
+    if src_data.get('sub_machine',""): 
+        detail += '\\作業機: '+ src_data.get('sub_machine')+ "\\"
+
+
     #エンジン型式
     detail += "\\"
     if src_data.get('engine_model',""): 
-        detail += 'エンジン型式: '+ src_data.get('engine_model')+ "\\"
+        detail += 'エンジン型式: '+ src_data.get('engine_model').replace(' ','').upper()+ "\\"
 
     #最大出力
     if src_data.get('max_ps',""): 
@@ -93,7 +109,8 @@ def convert_data(src_data):
 
     #備考
     memo = src_data.get('memo',"")
-    memo +=  '\\バッテリーサイズ: ' + src_data.get('battery_size',"")+ "\\"      
+    if src_data.get('battery_size',""):
+        memo +=  '\\バッテリーサイズ: ' + src_data.get('battery_size',"")+ "\\"      
 
     converted = {
         '相対番号': src_data.get('listing_number',""),
@@ -102,7 +119,7 @@ def convert_data(src_data):
         '担当者':   src_data.get('responsible_person',""),
         '商品名':   src_data.get('product_name',""),
         'メーカー': src_data.get('maker',""),
-        '型式': src_data.get('model',""),
+        '型式': src_data.get('model',"").replace(" ","").upper(),
         '梱包サイズ縦': src_data.get('size_depth') if src_data.get('size_depth',"") else "0",
         '梱包サイズ横': src_data.get('size_width') if src_data.get('size_width',"") else "0",
         '梱包サイズ高': src_data.get('size_height') if src_data.get('size_height',"") else "0",
@@ -142,6 +159,7 @@ if __name__ == "__main__":
     df = make_upload_data(json_data)
     # データフレームを JSON 形式の辞書に変換
     data_dict = df.to_dict(orient='records')
+    pprint.pprint(data_dict,indent=4)
 
     # CSVファイルに出力
     df.to_csv(f'{UPLOAD_FILE_NAME}.csv', index=False)
