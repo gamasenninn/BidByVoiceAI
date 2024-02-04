@@ -33,6 +33,42 @@ def make_top_sentence(text):
             return value
     return ""
 
+def extract_count(input_str, index):
+    """Extracts the numeric count following a character at a given index."""
+    if index != -1:
+        end_index = index + 1
+        while end_index < len(input_str) and input_str[end_index].isdigit():
+            end_index += 1
+        return int(input_str[index + 1:end_index]) if end_index > index + 1 else 1
+    return 0
+
+def create_movement_string(direction, count):
+    """Creates a formatted string for the movement."""
+    if count > 0:
+        moves = '-'.join(str(i) for i in range(1, count + 1))
+        return f"前進{moves}" if direction == 'f' else f"後進{moves}"
+    return ""
+
+def convert_movement_instructions(input_str):
+    input_str = input_str.replace(" ", "").lower()
+
+    # Extract counts for forward and reverse movements
+    forward_count = extract_count(input_str, input_str.find('f'))
+    reverse_count = extract_count(input_str, input_str.find('r'))
+
+    # Generate formatted strings for each movement
+    forward_str = create_movement_string('f', forward_count)
+    reverse_str = create_movement_string('r', reverse_count)
+
+    # Combine the results
+    return "、".join(filter(None, [forward_str, reverse_str]))
+
+def extract_and_format_number(input_str):
+    # 正規表現を使用して、数字を見つける
+    match = re.search(r'\d+', input_str)
+    if match:
+        return match.group() + "cm"
+    return ""
 
 def convert_data(src_data):
 
@@ -52,7 +88,6 @@ def convert_data(src_data):
     # 現在の日付を取得し、YYYY/MM/DD形式に変換
     current_date = datetime.now().strftime("%Y/%m/%d")
 
-
     detail = ""
     # 冒頭文を作成
     if src_data.get('product_name',""):
@@ -63,8 +98,9 @@ def convert_data(src_data):
         detail += 'アワーメーター: '+ src_data.get('hour') + "\\（展示移動によるメーター加算はご了承ください）\\"  
 
     # 主変速
-    if src_data.get('primary_transmission',""): 
-        detail += '主変速: '+ src_data.get('primary_transmission').upper() + "\\"  
+    if src_data.get('primary_transmission',""):
+        pt = convert_movement_instructions(src_data.get('primary_transmission')) 
+        detail += '主変速: '+ pt + "\\"  
 
     #副変速
     if src_data.get('secondary_transmission',""): 
@@ -72,11 +108,11 @@ def convert_data(src_data):
 
     #耕耘幅
     if src_data.get('plowing_width',""): 
-        detail += '\\耕耘幅: '+ src_data.get('plowing_width')+ "\\"
+        detail += '\\耕耘幅: '+ extract_and_format_number(src_data.get('plowing_width'))+ "\\"
 
     #刈幅
     if src_data.get('mowing_width',""): 
-        detail += '\\刈幅: '+ src_data.get('mowing_width')+ "\\"
+        detail += '\\刈幅: '+ extract_and_format_number(src_data.get('mowing_width'))+ "\\"
 
     #荷台寸法
     if src_data.get('cargo_size',""): 
@@ -98,12 +134,15 @@ def convert_data(src_data):
 
     #最大出力
     if src_data.get('max_ps',""): 
-        detail += '最大出力: '+ src_data.get('max_ps')+ "PS\\"
+        detail += '最大出力: '+ str(src_data.get('max_ps'))+ "PS\\"
 
     #燃料種別
     if src_data.get('fuel_type',""): 
         detail += '燃料種別: '+ src_data.get('fuel_type')+ "\\"
 
+    #仕様
+    if src_data.get('spec',""): 
+        detail += '\\【仕様】: '+ src_data.get('spec')+ "\\"
     #定型文
     detail+= "\\経年と使用によるサビ、傷、汚れがあります。\\画像のもので全てです。"
 
