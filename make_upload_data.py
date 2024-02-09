@@ -95,7 +95,7 @@ def convert_data(src_data):
 
     # アワー
     if src_data.get('hour',""): 
-        detail += 'アワーメーター: '+ src_data.get('hour') + "\\（展示移動によるメーター加算はご了承ください）\\"  
+        detail += 'アワーメーター: '+ str(src_data.get('hour')) + "\\（展示移動によるメーター加算はご了承ください）\\"  
 
     # 主変速
     if src_data.get('primary_transmission',""):
