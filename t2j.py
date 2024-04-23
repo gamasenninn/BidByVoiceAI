@@ -77,6 +77,10 @@ if __name__ == "__main__":
 
     with open(file_path,"r",encoding='utf-8') as f:
         content = f.read()
+        content = content.replace("まる","。")
+        content = content.replace("丸","。")
+        content = content.replace("マル","。")
+        #print(content)
 
         response = convert_to_json(content)
         print(response)
